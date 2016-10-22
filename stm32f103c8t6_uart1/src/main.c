@@ -74,7 +74,8 @@ main(int argc, char* argv[])
 {
 
 
-
+  const unsigned char msg1[] = " UART1 running\r\n";
+  const unsigned char msg2[] = " UART1 info inside loop\r\n";
   // Send a greeting to the trace device (skipped on Release).
   //trace_puts("Hello ARM World!");
 
@@ -85,8 +86,23 @@ main(int argc, char* argv[])
   timer_start();
 
   blink_led_init();
-  
+  Usart1Init();
+
   uint32_t seconds = 0;
+// the old way to send info
+
+  Usart1Put(0xD); // CR
+  Usart1Put(0xA); //LF
+  Usart1Put('S');
+  Usart1Put('T');
+  Usart1Put('A');
+  Usart1Put('R');
+  Usart1Put('T');
+  Usart1Put(0xD); // CR
+  Usart1Put(0xA); //LF
+
+  UART1Send(msg1, sizeof(msg1));
+
 
   // Infinite loop
   while (1)
@@ -98,9 +114,9 @@ main(int argc, char* argv[])
       timer_sleep(BLINK_OFF_TICKS);
 
       ++seconds;
-
+      UART1Send(msg2, sizeof(msg2));
       // Count seconds on the trace device.
-      trace_printf("Second %u\n", seconds);
+      //trace_printf("Second %u\n", seconds);
     }
   // Infinite loop, never return.
 }
