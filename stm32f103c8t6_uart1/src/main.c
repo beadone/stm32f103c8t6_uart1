@@ -24,7 +24,7 @@
   void Usart1Put(uint8_t ch);
   void Usart1Init(void);
   void UART1Send(const unsigned char *pucBuffer, unsigned long ulCount);
-  void USART1_IRQHandler(void);
+
 
 // ----------------------------------------------------------------------------
 //
@@ -195,32 +195,7 @@ SysTick_Handler (void)
 
 
 
-void USART1_IRQHandler(void)
-{
 
-  const unsigned char msg1[] = " interrupt!\r\n";
-  UART1Send(msg1, sizeof(msg1));
-    /* RXNE handler */
-    //
-
-      //if ((USART1->SR & USART_FLAG_RXNE) != (u16)RESET)
-  if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
-    {
-
-            Usart1Put('T');
-
-            /* Wait until Tx data register is empty, not really
-             * required for this example but put in here anyway.
-             */
-
-            while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
-            {
-            }
-           // USART_ClearITPendingBit(USART1, USART_IT_RXNE);
-        //}
-    }
-
-}
 
 void Usart1Init(void){
 
@@ -233,37 +208,15 @@ void Usart1Init(void){
   /* Enable clock for USART1, AFIO and GPIOA */
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1 | RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
 
-  //set up the interupt
-
-  NVIC_InitTypeDef NVIC_InitStructure;
-
-  /* Enable the USARTx Interrupt */
-  NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x01;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x01;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-
-  NVIC_EnableIRQ(USART1_IRQn);
-
   //Set USART1 Tx (PA.09) as AF push-pull
-
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
-
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
   GPIO_Init(GPIOA, &GPIO_InitStructure);
-
    /* GPIOA PIN9 alternative function Tx */
-
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
-
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
   //GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
-
   GPIO_Init(GPIOA, &GPIO_InitStructure);
 
 
@@ -274,28 +227,20 @@ void Usart1Init(void){
     */
    /* USART configuration structure for USART1 */
    USART_ClockStructInit(&USART_ClockInitStructure);
-
     USART_ClockInit(USART1, &USART_ClockInitStructure);
-
     USART_InitStructure.USART_BaudRate = 9600;
-
     USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-
     USART_InitStructure.USART_StopBits = USART_StopBits_1;
-
     USART_InitStructure.USART_Parity = USART_Parity_No ;
-
     USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-
     USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-
     //Write USART1 parameters
-
     USART_Init(USART1, &USART_InitStructure);
 
     //Enable USART1
 
     USART_Cmd(USART1, ENABLE);
+    //set up the interupt
 
 
 
